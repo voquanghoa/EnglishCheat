@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,12 +23,28 @@ public class WordTranslate {
         return download(word, "http://dictionary.cambridge.org/search/english/direct/?q="+word);
     }
 
+    private void putHeader(HttpURLConnection httpConn){
+        httpConn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+        httpConn.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch");
+        httpConn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36");
+    }
+
     private String download(String word, String stringUrl) throws IOException {
         URL url = new URL(stringUrl);
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         httpConn.setRequestMethod("GET");
+        putHeader(httpConn);
         httpConn.connect();
-        int httpCode = httpConn.getResponseCode();
+
+        int httpCode = 0;
+        try {
+            httpCode = httpConn.getResponseCode();
+        }catch (ProtocolException ex){
+            Log("Translating "+word + " error");
+            ex.printStackTrace();
+            httpCode = HttpURLConnection.HTTP_BAD_REQUEST;
+        }
+
         if(httpCode == HttpURLConnection.HTTP_MOVED_PERM){
             String nextPage = httpConn.getHeaderField("Location");
             Log.i("VOQUANGHOA", "Next page = " + nextPage);

@@ -1,7 +1,10 @@
 package com.quanghoa.englishcheat;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * Created by voqua on 3/21/2016.
@@ -55,8 +58,9 @@ public class TranslateController {
         return null;
     }
 
-    private boolean isWord(String word){
-        return !word.contains("[\\W]");
+    public boolean isWord(String word){
+        final Pattern p = Pattern.compile("[^a-zA-Z]");
+        return !p.matcher(word).find();
     }
 
 
@@ -85,7 +89,7 @@ public class TranslateController {
                 word = word.trim().toLowerCase();
 
                 if(!isWord(word)){
-                    sb.append(word);
+                    sb.append(word+" ");
                 }else{
                     Word wordObj = getWord(word);
                     if(wordObj!=null){

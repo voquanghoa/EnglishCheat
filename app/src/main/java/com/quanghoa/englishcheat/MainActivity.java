@@ -1,14 +1,16 @@
 package com.quanghoa.englishcheat;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements TranslateController.Translate {
+public class MainActivity extends Activity implements TranslateController.Translate {
 
     private TranslateController translateController;
     private EditText inputText;
@@ -27,13 +29,14 @@ public class MainActivity extends AppCompatActivity implements TranslateControll
         runOnUiThread(new Runnable() {
             public void run() {
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-                inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                if(inputMethodManager.isAcceptingText()){
+                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                }
             }
         });
     }
 
     public void translate(View view){
-        hideKeyboard();
         translateController.translate(inputText.getText().toString(), this);
     }
 
@@ -51,5 +54,11 @@ public class MainActivity extends AppCompatActivity implements TranslateControll
                 Toast.makeText(MainActivity.this,"Network error !!!",Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void copyResult(View view) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("Text", outputText.getText());
+        clipboard.setPrimaryClip(clip);
     }
 }
