@@ -16,20 +16,22 @@ import java.util.zip.GZIPInputStream;
  * Created by voqua on 3/21/2016.
  */
 public class WordTranslate {
-    private static String wordPattern = "<span class=\"ipa\">([^<]*)</span>";
-    private static Pattern pattern = Pattern.compile(wordPattern);
+    private static Pattern pronouncePattern = Pattern.compile("<span class=\"ipa\">([^<]*)</span>");
+    private static Pattern audioPattern = Pattern.compile("data-src-mp3=\\\"([^\\\"]*)");
 
-    public String translate(String word) throws IOException {
+    public Word translate(String word) throws IOException {
         return download(word, "http://dictionary.cambridge.org/search/english/direct/?q="+word);
     }
 
     private void putHeader(HttpURLConnection httpConn){
         httpConn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
         httpConn.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch");
-        httpConn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36");
+        httpConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36");
     }
 
-    private String download(String word, String stringUrl) throws IOException {
+    private Word download(String word, String stringUrl) throws IOException {
+        Word wordObj = new Word(word);
+
         URL url = new URL(stringUrl);
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         httpConn.setRequestMethod("GET");
@@ -69,13 +71,18 @@ public class WordTranslate {
             byteArrayOutputStream.close();
             String webContent = new String(byteArrayOutputStream.toByteArray());
 
-            Matcher m = pattern.matcher(webContent);
-            if(m.find()) {
-                return m.group(1);
+            Matcher pronundMatcher = pronouncePattern.matcher(webContent);
+            if(pronundMatcher.find()) {
+                wordObj.setPronounce(pronundMatcher.group(1));
+            }
+
+            Matcher audioMatcher = audioPattern.matcher(webContent);
+            if(audioMatcher.find()) {
+                wordObj.setAudioLink(audioMatcher.group(1));
             }
         }
-
-        return "("+word+ "??)";
+        Log(wordObj.toString());
+        return wordObj;
     }
 
     public  static void Log(String text){

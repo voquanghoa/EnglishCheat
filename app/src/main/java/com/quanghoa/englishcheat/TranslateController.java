@@ -41,17 +41,15 @@ public class TranslateController {
         return sentence.split(" ");
     }
 
-    private void addWord(String word, String pronounce){
-        Word wordObj = new Word();
-        wordObj.setDisplay(word);
-        wordObj.setPronounce(pronounce);
-        words.add(wordObj);
+    private synchronized void addWord(Word word){
+        words.add(word);
     }
 
-    private synchronized Word getWord(String word){
+    public synchronized Word getWord(String word){
+        word = word.trim();
         for(int i=0;i<words.size();i++){
             Word wordObj = words.get(i);
-            if(wordObj.getDisplay().equals(word)) {
+            if(wordObj.getDisplay().equalsIgnoreCase(word)) {
                 return wordObj;
             }
         }
@@ -84,21 +82,20 @@ public class TranslateController {
         StringBuffer sb = new StringBuffer();
 
         for(int i=0;i<words.length;i++){
-            String word = words[i].trim();
-            if(word!=null && word.length()>0){
-                word = word.trim().toLowerCase();
+            String textWord = words[i].trim();
+            if(textWord!=null && textWord.length()>0){
+                textWord = textWord.trim().toLowerCase();
 
-                if(!isWord(word)){
-                    sb.append(word+" ");
+                if(!isWord(textWord)){
+                    sb.append(textWord+" ");
                 }else{
-                    Word wordObj = getWord(word);
-                    if(wordObj!=null){
-                        sb.append(" "+wordObj.getPronounce());
-                    }else{
-                        String pronounce = wordTranslate.translate(word);
-                        addWord(word, pronounce);
-                        sb.append(" " + pronounce);
+                    Word wordObj = getWord(textWord);
+
+                    if(wordObj==null){
+                        wordObj = wordTranslate.translate(textWord);
+                        addWord(wordObj);
                     }
+                    sb.append(" " + wordObj.getPronounce());
                 }
 
                 translate.onUpdate(sb.toString());

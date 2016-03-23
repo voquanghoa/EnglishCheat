@@ -6,6 +6,7 @@ package com.quanghoa.englishcheat;
 public class Word {
     private String display;
     private String pronounce;
+    private String audioLink;
 
     public String getDisplay() {
         return display;
@@ -21,5 +22,24 @@ public class Word {
 
     public void setPronounce(String pronounce) {
         this.pronounce = pronounce;
+    }
+
+    public String getAudioLink() {
+        return audioLink;
+    }
+
+    public void setAudioLink(String audioLink) {
+        this.audioLink = audioLink;
+    }
+
+    public Word(String text){
+        text = text.trim();
+        setDisplay(text);
+        setPronounce("(" + text + "??)");
+        setAudioLink("");
+    }
+
+    public String toString(){
+        return String.format("%s : pronounce %s url %s",display, pronounce, audioLink);
     }
 }

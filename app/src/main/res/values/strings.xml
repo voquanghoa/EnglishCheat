@@ -2,4 +2,5 @@
     <string name="app_name">English Cheat @VQH</string>
     <string name="translate">Translate</string>
     <string name="copy_result">Copy result</string>
+    <string name="play_word">Play word</string>
 </resources>

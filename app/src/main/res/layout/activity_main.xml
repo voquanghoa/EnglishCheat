@@ -41,6 +41,12 @@
             android:onClick="copyResult"
             android:text="@string/copy_result"
             />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="listen"
+            android:text="@string/play_word"
+            />
     </LinearLayout>
 
     <EditText
